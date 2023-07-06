@@ -21,7 +21,7 @@ const main = async () => {
 
     const { body, statusCode } = await getUsersController.handle();
 
-    res.send(body).status(statusCode);
+    res.status(statusCode).send(body);
   });
   app.post("/users", async (req, res) => {
     const mongoCreateUserRepository = new MongoCreateUserRepository();
@@ -34,7 +34,7 @@ const main = async () => {
       body: req.body,
     });
 
-    res.send(body).status(statusCode);
+    res.status(statusCode).send(body);
   });
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));
