@@ -1,4 +1,5 @@
 import { User } from "../../models/user";
+import { BadRequest, ok, serverError } from "../helpers";
 import { HttpRequest, HttpResponse, IController } from "../protocols";
 import { IUpdateUserRepository, UpdateUserParams } from "./protocols";
 
@@ -6,22 +7,16 @@ export class UpdateUserController implements IController {
   constructor(private readonly updateUserRepository: IUpdateUserRepository) {}
   async handle(
     httpRequest: HttpRequest<UpdateUserParams>
-  ): Promise<HttpResponse<User>> {
+  ): Promise<HttpResponse<User | string>> {
     try {
       const id = httpRequest?.params?.id;
       const body = httpRequest?.body;
 
       if (!body) {
-        return {
-          statusCode: 400,
-          body: "Missing fields",
-        };
+        return BadRequest("Missing fields.");
       }
       if (!id) {
-        return {
-          statusCode: 400,
-          body: "missing user id",
-        };
+        return BadRequest("Missing user id.");
       }
       const allowedFieldsToUpdate: (keyof UpdateUserParams)[] = [
         "firstName",
@@ -33,18 +28,12 @@ export class UpdateUserController implements IController {
       );
 
       if (someFieldIsNotAllowedToUpdate) {
-        return { statusCode: 400, body: "Some received field is not alloned" };
+        return BadRequest("Some received field is not alloned");
       }
       const user = await this.updateUserRepository.updateUser(id, body);
-      return {
-        statusCode: 200,
-        body: user,
-      };
+      return ok<User>(user);
     } catch (error) {
-      return {
-        statusCode: 500,
-        body: "Something went wrong.",
-      };
+      return serverError();
     }
   }
 }
