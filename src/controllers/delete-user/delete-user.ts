@@ -5,7 +5,8 @@ import {  IDeleteUserRepository } from "./protocols";
 
 export class DeleteUserController implements IController {
   constructor(private readonly deleteUserRepository: IDeleteUserRepository) {}
-  async handle(httpRequest: HttpRequest<any>): Promise<HttpResponse<User | string>> {
+  async handle(httpRequest: HttpRequest<any>
+    ): Promise<HttpResponse<User | string>> {
     try {
       const id = httpRequest?.params?.id;
       if (!id) {
@@ -13,7 +14,7 @@ export class DeleteUserController implements IController {
        
       }
       const user = await this.deleteUserRepository.deleteUser(id);
-      return ok<User>(user)
+      return ok<User>(user);
     } catch (error) {
       return serverError();
     }

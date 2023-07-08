@@ -16,6 +16,6 @@ export enum HttpStatusCode{
   SERVER_ERROR= 500,
 }
 export interface IController {
-  handle(httpReques: HttpRequest<unknown>): Promise<HttpResponse<unknown>>;
+  handle(httpRequest: HttpRequest<unknown>): Promise<HttpResponse<unknown>>;
 
   }
