@@ -1,9 +1,11 @@
 {
     "version": 2,
     "builds": [
-      {
-        "src": "src/index.ts",
-        "use": "@vercel/node"
+      { "start:dev": "nodemon --watch 'src/' --exec 'ts-node src/index.ts' -e ts",
+      "start": "node build/index.js",
+      "build": "tsc --project tsconfig.json"
+        
+       
       }
     ],
     "routes": [
