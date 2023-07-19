@@ -9,12 +9,20 @@ import { UpdateUserController } from "./controllers/update-user/update-user";
 import { MongoUpdateUserRepository } from "./repositories/update-user/mongo-update-user";
 import { MongoDeleteUserRepository } from "./repositories/delete-user/mongo-delete-user";
 import { DeleteUserController } from "./controllers/delete-user/delete-user";
+import cors from 'cors';
+import { SignInController } from "./controllers/sign-in";
+import { MongoSignInRepository } from "./repositories/signin-user/mongo-signin-user";
+import { CreateTaskController } from "./controllers/create-task/create-task";
+import { MongoTaskRepository } from "./repositories/mongo-task-repository";
 
 const main = async () => {
   config();
   const app = express();
 
   app.use(express.json());
+
+
+  app.use(cors()); 
 
   await MongoClient.connect();
 
@@ -65,6 +73,26 @@ const main = async () => {
     const { body, statusCode } = await deleteUserController.handle({
       params: req.params,
     });
+    res.status(statusCode).send(body);
+  });
+
+  app.post("/signin", async (req, res) => {
+    const mongoSignInRepository = new MongoSignInRepository();
+    const signInController = new SignInController(mongoSignInRepository);
+    const { body, statusCode } = await signInController.handle({
+      body: req.body,
+    });
+    res.status(statusCode).send(body);
+  });
+
+  const mongoTaskRepository = new MongoTaskRepository();
+  const createTaskController = new CreateTaskController(mongoTaskRepository);
+
+  app.post('/tasks', async (req, res) => {
+    const { body, statusCode } = await createTaskController.handle({
+      body: req.body,
+    });
+
     res.status(statusCode).send(body);
   });
 

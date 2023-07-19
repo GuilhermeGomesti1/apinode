@@ -10,7 +10,7 @@ export class MongoCreateUserRepository implements ICreateUserRepository {
   async createUser(params: CreateUserParams): Promise<User> {
     const { insertedId } = await MongoClient.db
       .collection("users")
-      .insertOne(params);
+      .insertOne({ ...params, tasks:[] });
 
     const user = await MongoClient.db
       .collection<MongoUser>("users")

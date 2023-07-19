@@ -1,4 +1,4 @@
-import { HttpResponse, HttpStatusCode } from "./protocols";
+import { HttpResponse, HttpStatusCode} from "./protocols";
 
 export const ok = <T>(body: any): HttpResponse<T> => 
 ({statusCode: HttpStatusCode.OK, body });
@@ -12,6 +12,10 @@ export const BadRequest = (message: string): HttpResponse<string> => {
     body: message,
   };
 };
+export const unauthorized = (message: string): HttpResponse<string> => ({
+  statusCode: HttpStatusCode.UNAUTHORIZED,
+  body: message,
+});
 
 
 export const serverError = (): HttpResponse<string> => {
