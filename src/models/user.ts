@@ -1,12 +1,13 @@
 export interface User {
-  id:string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
   password: string;
-  tasks:[];
+  tasks: Task[];
+  token?: string;
+  username: string; // Adicione a propriedade 'username'
 }
-
 
 export interface Task {
   id: string;

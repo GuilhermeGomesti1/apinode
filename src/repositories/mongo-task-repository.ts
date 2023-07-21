@@ -3,6 +3,7 @@ import { ITaskRepository , Task} from "../controllers/protocols";
 import { MongoClient } from "../database/mongo";
 export class MongoTaskRepository implements ITaskRepository {
     async createTask(task: Task): Promise<Task> {
+        console.log("Task being saved:", task);
       const { insertedId } = await MongoClient.db
         .collection<Task>('tasks')
         .insertOne(task);

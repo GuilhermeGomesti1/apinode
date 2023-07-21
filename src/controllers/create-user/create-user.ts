@@ -1,13 +1,9 @@
 import validator from "validator";
-import { created, serverError } from "../helpers";
+import { created, serverError, BadRequest } from "../helpers";
 import { User } from "../../models/user";
 import { HttpRequest, HttpResponse , IController} from "../protocols";
-import {
-  CreateUserParams,
-  
-  ICreateUserRepository,
-} from "./protocols";
-import { BadRequest } from "../helpers";
+import {CreateUserParams, ICreateUserRepository} from "./protocols";
+import { v4 as uuidv4 } from 'uuid';
 
 export class CreateUserController implements IController {
   constructor(private readonly createUserRepository: ICreateUserRepository) {}
@@ -30,7 +26,8 @@ export class CreateUserController implements IController {
         if (!email || !validator.isEmail(email)) {
           return BadRequest("E-mail is invalid");
         }
-  
+        
+        uuidv4();
         // Criar novo usuário com array de tarefas vazio
         const user: User = {
           id: "",
@@ -39,6 +36,7 @@ export class CreateUserController implements IController {
           email: email,
           password: httpRequest.body?.password || "",
           tasks: [],
+          username:""
         };
       const createdUser = await this.createUserRepository.createUser(user);
 
