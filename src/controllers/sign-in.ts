@@ -22,13 +22,7 @@ export class SignInController implements IController {
         console.log("Usuário encontrado:", user);
 
         const token = generateToken({
-          userId: user.id, username: user.username,
-          id: "",
-          firstName: "",
-          lastName: "",
-          email: "",
-          password: "",
-          tasks: []
+          userId: user.id, 
         }); // Gera o token JWT com o ID do usuário
 
         user.token = token;

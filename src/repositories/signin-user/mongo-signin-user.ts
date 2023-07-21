@@ -5,6 +5,7 @@ import { MongoClient } from "../../database/mongo";
 export class MongoSignInRepository implements ISignInRepository {
   async signIn(email: string, password: string): Promise<User | null> {
     const user = await MongoClient.db.collection<User>("users").findOne({ email, password });
+    console.log("Resultado da consulta ao banco de dados:", user);
     return user;
   }
 }

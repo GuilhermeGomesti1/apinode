@@ -6,14 +6,7 @@ dotenv.config();
 
 export interface TokenPayload {
   userId: string;
-  username: string;
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  tasks: Task[];
-  token?: string;
+ 
  
   // ... outras informações do usuário que você deseja incluir no token ...
 }
@@ -28,7 +21,7 @@ if (!secretKey) {
 
 function generateToken(payload: TokenPayload): string {
   console.log("Secret Key:", secretKey);
-  const token = jwt.sign(payload, secretKey as Secret, { expiresIn: '1h' });
+  const token = jwt.sign(payload, secretKey as Secret,);
   return token;
 }
 

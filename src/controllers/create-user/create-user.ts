@@ -5,6 +5,7 @@ import { HttpRequest, HttpResponse , IController} from "../protocols";
 import {CreateUserParams, ICreateUserRepository} from "./protocols";
 import { v4 as uuidv4 } from 'uuid';
 
+
 export class CreateUserController implements IController {
   constructor(private readonly createUserRepository: ICreateUserRepository) {}
 
@@ -36,7 +37,8 @@ export class CreateUserController implements IController {
           email: email,
           password: httpRequest.body?.password || "",
           tasks: [],
-          username:""
+          username: "",
+          
         };
       const createdUser = await this.createUserRepository.createUser(user);
 

@@ -5,7 +5,7 @@ import { ITaskRepository } from "../protocols";
 import jwt, { Secret } from 'jsonwebtoken';
 import { MongoClient } from "../../database/mongo";
 import dotenv from "dotenv";
-import { TokenPayload } from '../../auth'
+import { TokenPayload } from '../../auth';
 
 dotenv.config();
 
@@ -17,6 +17,18 @@ export function decodeToken(token: string): TokenPayload {
     console.log("Erro ao decodificar o token:", (error as Error).message);
     throw new Error("Invalid token: unable to decode");
   }
+}
+
+export function generateToken(userId: string): string {
+  const payload = {
+    userId: userId,
+  };
+
+ 
+
+  const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as Secret);
+
+  return token;
 }
 
 export class CreateTaskController implements IController {
