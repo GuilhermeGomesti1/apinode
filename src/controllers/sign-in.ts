@@ -21,9 +21,11 @@ export class SignInController implements IController {
       if (user) {
         console.log("Usuário encontrado:", user);
 
+        const userId: string = user._id ? user._id.toString() : ""; // Verificação condicional para evitar 'undefined'
+
         const token = generateToken({
-          userId: user.id, 
-        }); // Gera o token JWT com o ID do usuário
+          userId,
+        });
 
         user.token = token;
         return ok<User>(user);

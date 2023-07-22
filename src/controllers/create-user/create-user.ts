@@ -16,7 +16,7 @@ export class CreateUserController implements IController {
       //verificar campos obrigatorios
       const requiredFields = ["firstName", "lastName", "email", "password"];
       for (const field of requiredFields) {
-        if (!httpRequest?.body?.[field as keyof CreateUserParams]?.length) {
+        if (!httpRequest?.body?.[field as keyof CreateUserParams]?.length) {return BadRequest(`Field ${field} is required`);
           return BadRequest(`Field ${field} is required`)
           
         }
