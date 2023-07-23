@@ -27,19 +27,24 @@ export class CreateUserController implements IController {
         if (!email || !validator.isEmail(email)) {
           return BadRequest("E-mail is invalid");
         }
-        
+       
         uuidv4();
+
+        
         // Criar novo usuário com array de tarefas vazio
         const user: User = {
-          id: "",
+         
+          id: uuidv4(),
           firstName: httpRequest.body?.firstName || "",
           lastName: httpRequest.body?.lastName || "",
           email: email,
           password: httpRequest.body?.password || "",
           tasks: [],
           username: "",
-          
+         
         };
+        
+
       const createdUser = await this.createUserRepository.createUser(user);
 
       return created<User>(createdUser);

@@ -1,7 +1,7 @@
-import { ObjectId } from 'mongodb';
+
 
 export interface User {
-  _id?: ObjectId;
+  
   id: string;
   firstName: string;
   lastName: string;
@@ -9,11 +9,12 @@ export interface User {
   password: string;
   tasks: Task[];
   token?: string;
-  username: string; // Adicione a propriedade 'username'
+  username: string; 
 }
 
 export interface Task {
-  id: string;
+  
+  userId: string;
   title:string;
   description: string;
   completed:boolean;

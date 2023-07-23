@@ -12,21 +12,37 @@ import { DeleteUserController } from "./controllers/delete-user/delete-user";
 import cors from "cors";
 import { SignInController } from "./controllers/sign-in";
 import { MongoSignInRepository } from "./repositories/signin-user/mongo-signin-user";
-import { CreateTaskController } from "./controllers/create-task/create-task";
+import {
+  CreateTaskController,
+  
+} from "./controllers/create-task/create-task";
 import { MongoTaskRepository } from "./repositories/mongo-task-repository";
 import dotenv from "dotenv";
+import { CreateTaskParams } from "./controllers/protocols";
+
 const main = async () => {
   dotenv.config();
-  
+
   const app = express();
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    next();
+  });
+
+  app.use(
+    cors({
+      origin: "*", // Permitir qualquer origem
+      methods: "*", // Permitir qualquer método
+      allowedHeaders: "*", // Permitir qualquer cabeçalho
+      credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
+    })
+  );
 
   app.use(express.json());
 
-  app.use(cors());
-
   app.use((req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1];
-    
+
     if (token) {
       console.log("Token recebido no cabeçalho da requisição:", token);
     }
@@ -44,6 +60,7 @@ const main = async () => {
 
     res.status(statusCode).send(body);
   });
+
   app.post("/users", async (req, res) => {
     const mongoCreateUserRepository = new MongoCreateUserRepository();
 
@@ -93,40 +110,22 @@ const main = async () => {
     });
     res.status(statusCode).send(body);
   });
+  
+  
+  
+  
+  
+  
 
   const mongoTaskRepository = new MongoTaskRepository();
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
-  //app.post((`/users/${userId}/tasks`), async (req, res) => {
-    app.post("/users/:userId/tasks", async (req, res) => {
-      try {
-        console.log("Requisição recebida na rota /users/:userId/tasks");
-        console.log("Parâmetros da requisição:", req.params);
-        console.log("Dados do corpo da requisição:", req.body);
-        
-        const { userId } = req.params;
-        if (!userId) {
-          throw new Error("User ID not provided in the request.");
-        }
-        
-        // Verifica se o cabeçalho de autorização está presente na requisição
-        const authorizationHeader = req.headers.authorization;
-        if (!authorizationHeader) {
-          throw new Error("Header 'authorization' not found in the request.");
-        }
-    
-        const { body, statusCode } = await createTaskController.handle({
-          body: req.body,
-        });
-    
-        console.log("Resposta da controladora:", statusCode, body);
-    
-        res.status(statusCode).json(body);
-      } catch (error) {
-        console.error("Erro na rota /users/:userId/tasks:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-      }
+  app.post("/tasks/:id/tasks", async (req, res) => {
+    const { body, statusCode } = await createTaskController.handle({
+      body: req.body as CreateTaskParams, 
     });
+    res.status(statusCode).send(body);
+  });
 
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));

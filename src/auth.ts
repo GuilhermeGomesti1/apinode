@@ -1,16 +1,14 @@
-import jwt,{Secret} from 'jsonwebtoken';
-import dotenv from 'dotenv'
-import { Task } from './models/user';
+import jwt, { Secret } from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-dotenv.config(); 
+
+dotenv.config();
 
 export interface TokenPayload {
   userId: string;
  
  
-  // ... outras informações do usuário que você deseja incluir no token ...
 }
-
 const secretKey = process.env.JWT_SECRET_KEY;
 
 if (!secretKey) {

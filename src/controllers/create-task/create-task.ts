@@ -35,10 +35,13 @@ export class CreateTaskController implements IController {
   constructor(private readonly taskRepository: ITaskRepository) {}
   async handle(
     httpRequest: HttpRequest<CreateTaskParams>
-  ): Promise<HttpResponse<Task | string>> {
+  ): Promise<HttpResponse<Task | string>> 
+  {     console.log("Headers received in CreateTaskController:", httpRequest.headers);
     try {
       const { title, description } = httpRequest.body || {};
-      const token = httpRequest.headers.authorization?.split(" ")[1]; // Obtém o token do cabeçalho da requisição
+      console.log("Headers received:", httpRequest.headers);
+      const token = httpRequest.headers.authorization?.split(" ")[1]; 
+      console.log("Token recebido no cabeçalho da requisição:", token);// Obtém o token do cabeçalho da requisição
       if (!title || !description || !token) {
         return {
           statusCode: 400,
@@ -47,6 +50,7 @@ export class CreateTaskController implements IController {
       }
       const decodedToken = decodeToken(token); // Decodifica o token JWT
       const userId = decodedToken.userId;
+      console.log("User ID do usuário antes da criação da task:", userId);
 
       const task: Task = {
         id: generateId(),
@@ -58,9 +62,11 @@ export class CreateTaskController implements IController {
 
       const createdTask = await this.taskRepository.createTask(task);
       console.log("Created Task:", createdTask);
+      console.log("User ID do usuário após a criação da task:", userId); 
+      
       const userCollection = MongoClient.db.collection("users");
       await userCollection.updateOne(
-        { _id: userId },
+        { id: userId },
         { $push: { tasks: createdTask.id } }
       );
 

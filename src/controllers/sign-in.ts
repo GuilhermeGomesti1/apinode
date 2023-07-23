@@ -1,7 +1,7 @@
 import { User } from "../models/user";
 import { ok, serverError, unauthorized } from "./helpers"; 
 import { HttpResponse, IController, HttpRequest } from "./protocols";
-import jwt from 'jsonwebtoken';
+
 import { generateToken } from "../auth";
 
 export class SignInController implements IController {
@@ -21,7 +21,7 @@ export class SignInController implements IController {
       if (user) {
         console.log("Usuário encontrado:", user);
 
-        const userId: string = user._id ? user._id.toString() : ""; // Verificação condicional para evitar 'undefined'
+        const userId: string = user.id ? user.id.toString() : ""; // Verificação condicional para evitar 'undefined'
 
         const token = generateToken({
           userId,
@@ -42,4 +42,3 @@ export class SignInController implements IController {
 export interface ISignInRepository {
   signIn(email: string, password: string): Promise<User | null>;
 }
-
