@@ -53,12 +53,12 @@ export class CreateTaskController implements IController {
       console.log("User ID do usuário antes da criação da task:", userId);
 
       const task: Task = {
-        id: generateId(),
-        userId: userId,
+        taskId: generateId(),  
+        userId: decodedToken.userId,
         title,
         description,
-        completed: false,
-      };
+        completed: false
+      }
 
       const createdTask = await this.taskRepository.createTask(task);
       console.log("Created Task:", createdTask);
@@ -67,7 +67,7 @@ export class CreateTaskController implements IController {
       const userCollection = MongoClient.db.collection("users");
       await userCollection.updateOne(
         { id: userId },
-        { $push: { tasks: createdTask.id } }
+        { $push: { tasks: createdTask.taskId } }
       );
 
       return {

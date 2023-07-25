@@ -28,6 +28,10 @@ const main = async () => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     next();
   });
+  app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.json({ type: 'application/json' }));
+app.use(express.raw({ type: 'application/octet-stream' }));
 
   app.use(
     cors({
@@ -120,7 +124,7 @@ const main = async () => {
   const mongoTaskRepository = new MongoTaskRepository();
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
-  app.post("/tasks/:id/tasks", async (req, res) => {
+  app.post("/:userId/tasks", async (req, res) => {
     const { body, statusCode } = await createTaskController.handle({
       body: req.body as CreateTaskParams, 
     });

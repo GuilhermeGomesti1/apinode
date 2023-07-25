@@ -12,10 +12,10 @@ export interface User {
   username: string; 
 }
 
-export interface Task {
-  
-  userId: string;
-  title:string;
+interface Task {
+  taskId: string;  
+  userId: string;  
+  title: string;
   description: string;
-  completed:boolean;
+  completed: boolean;
 }

@@ -38,9 +38,9 @@ export interface IController {
   }
 
   export interface Task {
-    id: string;
-    userId: string;
-    title:string;
-    description:string;
-    completed:boolean;
+    taskId: string;  
+    userId: string;  
+    title: string;
+    description: string;
+    completed: boolean;
   }
