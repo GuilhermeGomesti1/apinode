@@ -19,13 +19,7 @@ export function decodeToken(token: string): TokenPayload {
   }
 }
 
-export function generateToken(userId: string): string {
-  const payload = {
-    userId: userId,
-  };
-
- 
-
+export function generateToken(payload: TokenPayload): string {
   const token = jwt.sign(payload, process.env.JWT_SECRET_KEY as Secret);
 
   return token;
@@ -35,40 +29,62 @@ export class CreateTaskController implements IController {
   constructor(private readonly taskRepository: ITaskRepository) {}
   async handle(
     httpRequest: HttpRequest<CreateTaskParams>
-  ): Promise<HttpResponse<Task | string>> 
-  {     console.log("Headers received in CreateTaskController:", httpRequest.headers);
+  ): Promise<HttpResponse<Task | string>> {
+    console.log("Headers received in CreateTaskController:", httpRequest.headers);
+
     try {
       const { title, description } = httpRequest.body || {};
-      console.log("Headers received:", httpRequest.headers);
-      const token = httpRequest.headers.authorization?.split(" ")[1]; 
-      console.log("Token recebido no cabeçalho da requisição:", token);// Obtém o token do cabeçalho da requisição
+      const authorizationHeader = httpRequest.headers['authorization'];
+      
+      if (!authorizationHeader) {
+        return {
+          statusCode: 401,
+          body: "Authorization header missing",
+        };
+      }
+
+      const token = authorizationHeader.split(" ")[1];
+      // Verifica se todas as informações necessárias estão presentes
       if (!title || !description || !token) {
         return {
           statusCode: 400,
           body: "Title, description, and token are required",
         };
       }
-      const decodedToken = decodeToken(token); // Decodifica o token JWT
-      const userId = decodedToken.userId;
-      console.log("User ID do usuário antes da criação da task:", userId);
 
-      const task: Task = {
-        taskId: generateId(),  
-        userId: decodedToken.userId,
-        title,
-        description,
-        completed: false
+      // Decodifica o token JWT para obter o userId
+      const decodedToken = decodeToken(token);
+      const userIdFromToken = decodedToken.userId;
+
+      // Verifica se a variável userIdFromToken contém um valor válido
+      if (!userIdFromToken) {
+        return {
+          statusCode: 400,
+          body: "Invalid token: userId not found in token payload",
+        };
       }
 
+      // Cria a tarefa com o ID do usuário obtido do token
+      const task: Task = {
+        taskId: generateId(),
+        userId: userIdFromToken,
+        title,
+        description,
+        completed: false,
+      };
+
+      // Adiciona a tarefa ao usuário no banco de dados
       const createdTask = await this.taskRepository.createTask(task);
-      console.log("Created Task:", createdTask);
-      console.log("User ID do usuário após a criação da task:", userId); 
-      
+
+      // Atualiza a coleção de usuários no banco de dados
       const userCollection = MongoClient.db.collection("users");
       await userCollection.updateOne(
-        { id: userId },
+        { id: userIdFromToken },
         { $push: { tasks: createdTask.taskId } }
       );
+
+      console.log("Created Task:", createdTask);
+      console.log("User ID do usuário após a criação da task:", userIdFromToken);
 
       return {
         statusCode: 201,

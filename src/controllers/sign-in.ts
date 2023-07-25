@@ -15,6 +15,7 @@ export class SignInController implements IController {
       if (!email || !password) {
         return unauthorized("Credenciais inválidas"); // Retorna resposta de não autorizado caso email ou password estejam faltando
       }
+      
 
       const user = await this.signInRepository.signIn(email, password);
       

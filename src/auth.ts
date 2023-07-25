@@ -17,6 +17,16 @@ if (!secretKey) {
   console.log('JWT_SECRET_KEY found:', secretKey);
 }
 
+export function decodeToken(token: string): TokenPayload {
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as Secret) as TokenPayload;
+    return decoded;
+  } catch (error) {
+    console.log("Erro ao decodificar o token:", (error as Error).message);
+    throw new Error("Invalid token: unable to decode");
+  }
+}
+
 function generateToken(payload: TokenPayload): string {
   console.log("Secret Key:", secretKey);
   const token = jwt.sign(payload, secretKey as Secret,);

@@ -124,11 +124,18 @@ app.use(express.raw({ type: 'application/octet-stream' }));
   const mongoTaskRepository = new MongoTaskRepository();
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
+  
   app.post("/:userId/tasks", async (req, res) => {
-    const { body, statusCode } = await createTaskController.handle({
-      body: req.body as CreateTaskParams, 
-    });
-    res.status(statusCode).send(body);
+    console.log("Headers received in CreateTaskController:", req.headers);
+    try {
+      const { body, statusCode } = await createTaskController.handle({
+        body: req.body as CreateTaskParams, 
+      });
+      res.status(statusCode).send(body);
+    } catch (error) {
+      console.error("Erro ao criar tarefa:", error);
+      res.status(500).json({ error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes." });
+    }
   });
 
   const port = process.env.PORT || 8000;
