@@ -37,7 +37,7 @@ app.use(express.raw({ type: 'application/octet-stream' }));
     cors({
       origin: "*", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
-      allowedHeaders: "*", // Permitir qualquer cabeçalho
+    
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
     })
   );
@@ -45,7 +45,7 @@ app.use(express.raw({ type: 'application/octet-stream' }));
   app.use(express.json());
 
   app.use((req, res, next) => {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = req?.headers?.authorization?.split(" ")[1];
 
     if (token) {
       console.log("Token recebido no cabeçalho da requisição:", token);
@@ -126,7 +126,6 @@ app.use(express.raw({ type: 'application/octet-stream' }));
 
   
   app.post("/:userId/tasks", async (req, res) => {
-    console.log("Headers received in CreateTaskController:", req.headers);
     try {
       const { body, statusCode } = await createTaskController.handle({
         body: req.body as CreateTaskParams, 

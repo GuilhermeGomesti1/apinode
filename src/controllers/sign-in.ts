@@ -21,9 +21,9 @@ export class SignInController implements IController {
       
       if (user) {
         console.log("Usuário encontrado:", user);
-
+       
         const userId: string = user.id ? user.id.toString() : ""; // Verificação condicional para evitar 'undefined'
-
+        console.log("userId", userId)
         const token = generateToken({
           userId,
         });

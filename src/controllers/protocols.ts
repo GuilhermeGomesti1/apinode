@@ -10,7 +10,7 @@ export interface ISignInRepository {
 }
 export interface HttpRequest<B> {
   params?: any;
-  headers?: any;
+  headers?: { [key: string]: string } | undefined;
   body?: B;
 }
 

@@ -30,11 +30,13 @@ export class CreateTaskController implements IController {
   async handle(
     httpRequest: HttpRequest<CreateTaskParams>
   ): Promise<HttpResponse<Task | string>> {
-    console.log("Headers received in CreateTaskController:", httpRequest.headers);
+    await new Promise((resolve) => setTimeout(resolve, 0)); // Esperar por uma microtarefa
+   
+
 
     try {
       const { title, description } = httpRequest.body || {};
-      const authorizationHeader = httpRequest.headers['authorization'];
+      const authorizationHeader = httpRequest?.headers?.['authorization'];
       
       if (!authorizationHeader) {
         return {
@@ -42,7 +44,12 @@ export class CreateTaskController implements IController {
           body: "Authorization header missing",
         };
       }
-
+      if (!httpRequest.headers) {
+        return {
+          statusCode: 400,
+          body: "Headers missing",
+        };
+      }
       const token = authorizationHeader.split(" ")[1];
       // Verifica se todas as informações necessárias estão presentes
       if (!title || !description || !token) {
