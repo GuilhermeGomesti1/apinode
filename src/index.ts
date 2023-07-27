@@ -24,23 +24,31 @@ const main = async () => {
   dotenv.config();
 
   const app = express();
-  app.use((req, res, next) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    next();
-  });
-  app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
-app.use(express.json({ type: 'application/json' }));
-app.use(express.raw({ type: 'application/octet-stream' }));
+
 
   app.use(
     cors({
       origin: "*", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
-    
+      exposedHeaders: ['Authorization'],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
+      allowedHeaders: "*",
     })
   );
+
+
+  app.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    next();
+  });
+
+  
+  app.use(express.json()); 
+app.use(express.urlencoded({ extended: true })); 
+app.use(express.json({ type: 'application/json' }));
+app.use(express.raw({ type: 'application/octet-stream' }));
+
 
   app.use(express.json());
 
