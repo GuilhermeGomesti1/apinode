@@ -23,6 +23,8 @@ import { CreateTaskParams } from "./controllers/protocols";
 const main = async () => {
   dotenv.config();
 
+
+    
   const app = express();
 
 
@@ -38,6 +40,7 @@ const main = async () => {
 
 
   app.use((req, res, next) => {
+    console.log("Requisição recebida:", req.method, req.url, req.headers);
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     next();
@@ -134,18 +137,41 @@ app.use(express.raw({ type: 'application/octet-stream' }));
   const mongoTaskRepository = new MongoTaskRepository();
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
-  
-  app.post("/:id/tasks", async (req, res) => {
-    try {
-      const { body, statusCode } = await createTaskController.handle({
-        body: req.body as CreateTaskParams, 
-      });
-      res.status(statusCode).json(body);
-    } catch (error) {
-      console.error("Erro ao criar tarefa:", error);
-      res.status(500).json({ error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes." });
-    }
-  });
+// Middleware para verificar o token apenas para a rota de criação de tarefas
+app.use("/:id/tasks", (req, res, next) => {
+  console.log("Middleware para verificar token foi chamado");
+  const authorizationHeader = req?.headers?.authorization;
+
+  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+    // Token não fornecido ou inválido
+    console.log("Token não fornecido ou inválido");
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const token = authorizationHeader.split(" ")[1];
+  console.log("Token recebido no cabeçalho da requisição:", token);
+  if (!token) {
+    console.log("Token não fornecido");
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Verifique o token aqui usando a função decodeToken ou qualquer outra lógica de validação
+
+  next(); // Se tudo estiver correto, prossegue com o fluxo normal da requisição
+});
+
+app.post("/:id/tasks", async (req, res) => {
+  try {
+    // Rota de criação de tarefas
+    const { body, statusCode } = await createTaskController.handle({
+      body: req.body as CreateTaskParams, 
+    });
+    res.status(statusCode).json(body);
+  } catch (error) {
+    console.error("Erro ao criar tarefa:", error);
+    res.status(500).json({ error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes." });
+  }
+});
 
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));

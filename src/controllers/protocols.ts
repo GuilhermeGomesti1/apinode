@@ -28,9 +28,10 @@ export interface IController {
 
 
   export interface CreateTaskParams {
-    userId: string,
-    title:string,
-    description: string,
+    userId?: string,
+    title?:string,
+    description?: string,
+    authorization?: string;
   }
 
   export interface ITaskRepository{
@@ -43,4 +44,5 @@ export interface IController {
     title: string;
     description: string;
     completed: boolean;
+    
   }
