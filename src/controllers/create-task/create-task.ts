@@ -2,16 +2,19 @@ import { HttpRequest, HttpResponse, IController } from "../protocols";
 import { CreateTaskParams } from "../protocols";
 import { Task } from "../protocols";
 import { ITaskRepository } from "../protocols";
-import jwt, { Secret } from 'jsonwebtoken';
+import jwt, { Secret } from "jsonwebtoken";
 import { MongoClient } from "../../database/mongo";
 import dotenv from "dotenv";
-import { TokenPayload } from '../../auth';
+import { TokenPayload } from "../../auth";
 
 dotenv.config();
 
 export function decodeToken(token: string): TokenPayload {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as Secret) as TokenPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET_KEY as Secret
+    ) as TokenPayload;
     return decoded;
   } catch (error) {
     console.log("Erro ao decodificar o token:", (error as Error).message);
@@ -31,14 +34,12 @@ export class CreateTaskController implements IController {
     httpRequest: HttpRequest<CreateTaskParams>
   ): Promise<HttpResponse<Task | string>> {
     await new Promise((resolve) => setTimeout(resolve, 0)); // Esperar por uma microtarefa
-    
-
 
     try {
       const { title, description } = httpRequest.body || {};
-      const authorizationHeader = httpRequest?.headers?.['authorization'];
+      const authorizationHeader = httpRequest?.headers?.["authorization"];
 
-      console.log("Authorization Header:", authorizationHeader)
+      console.log("Authorization Header:", authorizationHeader);
 
       if (!authorizationHeader) {
         return {
@@ -52,8 +53,8 @@ export class CreateTaskController implements IController {
           body: "Headers missing",
         };
       }
-      
-      const token = authorizationHeader.split(" ")[1] ;
+
+      const token = authorizationHeader.split(" ")[1];
       console.log("Token:", token);
       // Verifica se todas as informações necessárias estão presentes
       if (!title || !description || !token) {
@@ -66,7 +67,7 @@ export class CreateTaskController implements IController {
       // Decodifica o token JWT para obter o userId
       const decodedToken = decodeToken(token);
       const userIdFromToken = decodedToken.userId;
-      
+
       console.log("userIdFromToken:", userIdFromToken);
 
       // Verifica se a variável userIdFromToken contém um valor válido
@@ -97,7 +98,10 @@ export class CreateTaskController implements IController {
       );
 
       console.log("Created Task:", createdTask);
-      console.log("User ID do usuário após a criação da task:", userIdFromToken);
+      console.log(
+        "User ID do usuário após a criação da task:",
+        userIdFromToken
+      );
 
       return {
         statusCode: 201,
