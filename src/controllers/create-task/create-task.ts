@@ -31,13 +31,15 @@ export class CreateTaskController implements IController {
     httpRequest: HttpRequest<CreateTaskParams>
   ): Promise<HttpResponse<Task | string>> {
     await new Promise((resolve) => setTimeout(resolve, 0)); // Esperar por uma microtarefa
-   
+    
 
 
     try {
       const { title, description } = httpRequest.body || {};
       const authorizationHeader = httpRequest?.headers?.['authorization'];
-      
+
+      console.log("Authorization Header:", authorizationHeader)
+
       if (!authorizationHeader) {
         return {
           statusCode: 401,
@@ -50,7 +52,9 @@ export class CreateTaskController implements IController {
           body: "Headers missing",
         };
       }
-      const token = authorizationHeader.split(" ")[1];
+      
+      const token = authorizationHeader.split(" ")[1] ;
+      console.log("Token:", token);
       // Verifica se todas as informações necessárias estão presentes
       if (!title || !description || !token) {
         return {
@@ -62,6 +66,8 @@ export class CreateTaskController implements IController {
       // Decodifica o token JWT para obter o userId
       const decodedToken = decodeToken(token);
       const userIdFromToken = decodedToken.userId;
+      
+      console.log("userIdFromToken:", userIdFromToken);
 
       // Verifica se a variável userIdFromToken contém um valor válido
       if (!userIdFromToken) {
@@ -82,11 +88,11 @@ export class CreateTaskController implements IController {
 
       // Adiciona a tarefa ao usuário no banco de dados
       const createdTask = await this.taskRepository.createTask(task);
-
+      console.log("Created Task:", createdTask);
       // Atualiza a coleção de usuários no banco de dados
       const userCollection = MongoClient.db.collection("users");
       await userCollection.updateOne(
-        { id: userIdFromToken },
+        { userId: userIdFromToken },
         { $push: { tasks: createdTask.taskId } }
       );
 

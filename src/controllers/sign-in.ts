@@ -27,7 +27,8 @@ export class SignInController implements IController {
         const token = generateToken({
           userId,
         });
-
+        console.log("Token gerado:", token);
+        
         user.token = token;
         return ok<User>(user);
       } else {

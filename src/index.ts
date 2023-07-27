@@ -45,11 +45,13 @@ app.use(express.raw({ type: 'application/octet-stream' }));
   app.use(express.json());
 
   app.use((req, res, next) => {
-    const token = req?.headers?.authorization?.split(" ")[1];
-
-    if (token) {
+    const authorizationHeader = req?.headers?.authorization;
+  
+    if (authorizationHeader) {
+      const token = authorizationHeader.split(" ")[1];
       console.log("Token recebido no cabeçalho da requisição:", token);
     }
+  
     next();
   });
 
@@ -106,7 +108,7 @@ app.use(express.raw({ type: 'application/octet-stream' }));
     res.status(statusCode).send(body);
   });
 
-  app.post("/signin", async (req, res) => {
+  app.post("/signin/", async (req, res) => {
     const mongoSignInRepository = new MongoSignInRepository();
     const signInController = new SignInController(mongoSignInRepository);
     const { body, statusCode } = await signInController.handle({
@@ -125,12 +127,12 @@ app.use(express.raw({ type: 'application/octet-stream' }));
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
   
-  app.post("/:userId/tasks", async (req, res) => {
+  app.post("/:id/tasks", async (req, res) => {
     try {
       const { body, statusCode } = await createTaskController.handle({
         body: req.body as CreateTaskParams, 
       });
-      res.status(statusCode).send(body);
+      res.status(statusCode).json(body);
     } catch (error) {
       console.error("Erro ao criar tarefa:", error);
       res.status(500).json({ error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes." });
