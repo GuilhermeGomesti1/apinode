@@ -1,9 +1,8 @@
 import { User } from "../models/user";
 
-
 export interface HttpResponse<T> {
   statusCode: HttpStatusCode;
-  body: T ;
+  body: T;
 }
 export interface ISignInRepository {
   signIn(email: string, password: string): Promise<User | null>;
@@ -23,26 +22,24 @@ export enum HttpStatusCode {
 }
 export interface IController {
   handle(httpRequest: HttpRequest<unknown>): Promise<HttpResponse<unknown>>;
+}
 
-  }
+export interface CreateTaskParams {
+  userId?: string;
+  title?: string;
+  description?: string;
 
+  authorizationHeader?: string;
+}
 
-  export interface CreateTaskParams {
-    userId?: string,
-    title?:string,
-    description?: string,
-    authorization?: string;
-  }
+export interface ITaskRepository {
+  createTask(task: Task): Promise<Task>;
+}
 
-  export interface ITaskRepository{
-    createTask(task: Task): Promise<Task>;
-  }
-
-  export interface Task {
-    taskId: string;  
-    userId: string;  
-    title: string;
-    description: string;
-    completed: boolean;
-    
-  }
+export interface Task {
+  taskId: string;
+  userId: string;
+  title: string;
+  description: string;
+  completed: boolean;
+}

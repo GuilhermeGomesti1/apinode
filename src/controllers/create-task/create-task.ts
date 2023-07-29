@@ -16,18 +16,28 @@ export class CreateTaskController implements IController {
     httpRequest: HttpRequest<CreateTaskParams>
   ): Promise<HttpResponse<Task | string>> {
     try {
-      const { title, description, authorization } = httpRequest.body || {};
-      console.log("Credenciais recebidas:", { title, description ,authorization });
-
-      
-
-      if (!title || !description) {
+      const { title, description} = httpRequest.body || {};
+      console.log("Credenciais recebidas:", { title, description });
+       if (!title || !description) {
         console.log("Dados inválidos");
         return unauthorized("Dados inválidos"); // Retorna resposta de não autorizado caso title ou description estejam faltando
       }
-      console.log("Authorization header:", authorization);
 
-      const token = authorization?.split("Bearer ")[1]; // Extrai o token do cabeçalho de autorização
+      console.log('httpRequest get ',httpRequest);
+      
+      const authorizationHeader = httpRequest?.headers?.Authorization;
+      if (!authorizationHeader) {
+        // Se o cabeçalho de autorização não estiver presente, retorne uma resposta de não autorizado
+        return {
+          statusCode: 401,
+          body: 'Token de autorização não fornecido',
+        };
+      }
+      
+      console.log('httpRequest header',httpRequest?.headers)
+      console.log("Authorization header:", authorizationHeader);
+
+      const token = authorizationHeader?.split("Bearer ")[1]; // Extrai o token do cabeçalho de autorização
       console.log("token:",token)
 
       if (!token) {
@@ -50,6 +60,7 @@ export class CreateTaskController implements IController {
 // Adiciona a tarefa ao usuário no banco de dados
 const createdTask = await this.taskRepository.createTask(task);
 console.log("Tarefa criada:", createdTask);
+
       // Decodifica o token JWT para obter o userId
      // Atualiza a coleção de usuários no banco de dados
      const userCollection = MongoClient.db.collection("users");

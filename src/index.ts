@@ -12,10 +12,7 @@ import { DeleteUserController } from "./controllers/delete-user/delete-user";
 import cors from "cors";
 import { SignInController } from "./controllers/sign-in";
 import { MongoSignInRepository } from "./repositories/signin-user/mongo-signin-user";
-import {
-  CreateTaskController,
-  
-} from "./controllers/create-task/create-task";
+import { CreateTaskController } from "./controllers/create-task/create-task";
 import { MongoTaskRepository } from "./repositories/mongo-task-repository";
 import dotenv from "dotenv";
 import { CreateTaskParams } from "./controllers/protocols";
@@ -23,21 +20,17 @@ import { CreateTaskParams } from "./controllers/protocols";
 const main = async () => {
   dotenv.config();
 
-
-    
   const app = express();
-
 
   app.use(
     cors({
       origin: "*", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
-      exposedHeaders: ['Authorization'],
+      exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
       allowedHeaders: "*",
     })
   );
-
 
   app.use((req, res, next) => {
     console.log("Requisição recebida:", req.method, req.url, req.headers);
@@ -46,23 +39,21 @@ const main = async () => {
     next();
   });
 
-  
-  app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
-app.use(express.json({ type: 'application/json' }));
-app.use(express.raw({ type: 'application/octet-stream' }));
-
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+  app.use(express.json({ type: "application/json" }));
+  app.use(express.raw({ type: "application/octet-stream" }));
 
   app.use(express.json());
 
   app.use((req, res, next) => {
     const authorizationHeader = req?.headers?.authorization;
-  
+
     if (authorizationHeader) {
       const token = authorizationHeader.split(" ")[1];
       console.log("Token recebido no cabeçalho da requisição:", token);
     }
-  
+
     next();
   });
 
@@ -127,51 +118,44 @@ app.use(express.raw({ type: 'application/octet-stream' }));
     });
     res.status(statusCode).send(body);
   });
-  
-  
-  
-  
-  
-  
 
   const mongoTaskRepository = new MongoTaskRepository();
   const createTaskController = new CreateTaskController(mongoTaskRepository);
 
-// Middleware para verificar o token apenas para a rota de criação de tarefas
-app.use("/:id/tasks", (req, res, next) => {
-  console.log("Middleware para verificar token foi chamado");
-  const authorizationHeader = req?.headers?.authorization;
+  // Middleware para verificar o token apenas para a rota de criação de tarefas
+  app.post("/:id/tasks", async (req, res, next) => {
+    console.log("Middleware para verificar token foi chamado");
+    const authorizationHeader = req?.headers?.authorization;
 
-  if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
-    // Token não fornecido ou inválido
-    console.log("Token não fornecido ou inválido");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+    if (!authorizationHeader || !authorizationHeader.startsWith("Bearer ")) {
+      // Token não fornecido ou inválido
+      console.log("Token não fornecido ou inválido");
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-  const token = authorizationHeader.split(" ")[1];
-  console.log("Token recebido no cabeçalho da requisição:", token);
-  if (!token) {
-    console.log("Token não fornecido");
-    return res.status(401).json({ error: "Unauthorized" });
-  }
+    const token = authorizationHeader.split(" ")[1];
+    console.log("Token recebido no cabeçalho da requisição:", token);
+    if (!token) {
+      console.log("Token não fornecido");
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
-  // Verifique o token aqui usando a função decodeToken ou qualquer outra lógica de validação
-
-  next(); // Se tudo estiver correto, prossegue com o fluxo normal da requisição
-});
-
-app.post("/:id/tasks", async (req, res) => {
-  try {
-    // Rota de criação de tarefas
-    const { body, statusCode } = await createTaskController.handle({
-      body: req.body as CreateTaskParams, 
-    });
-    res.status(statusCode).json(body);
-  } catch (error) {
-    console.error("Erro ao criar tarefa:", error);
-    res.status(500).json({ error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes." });
-  }
-});
+    try {
+      const { body, statusCode } = await createTaskController.handle({
+        body: req.body as CreateTaskParams,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      res.status(statusCode).json(body);
+    } catch (error) {
+      console.error("Erro ao criar tarefa:", error);
+      res
+        .status(500)
+        .json({
+          error:
+            "Erro ao criar tarefa. Verifique o servidor para mais detalhes.",
+        });
+    }
+  });
 
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));
