@@ -6,6 +6,7 @@ import { decodeToken } from "../../auth"; // Importa a função 'decodeToken'
 import { MongoClient } from "../../database/mongo";
 import dotenv from "dotenv";
 import { unauthorized } from "../helpers";
+import { User } from "../../models/user";
 
 dotenv.config();
 
@@ -63,16 +64,16 @@ console.log("Tarefa criada:", createdTask);
 
       // Decodifica o token JWT para obter o userId
      // Atualiza a coleção de usuários no banco de dados
-     const userCollection = MongoClient.db.collection("users");
-     await userCollection.updateOne(
-       { userId: userIdFromToken },
-       { $push: { tasks: createdTask.taskId } }
-     );
-      console.log("Created Task:", createdTask);
-      console.log(
-        "User ID do usuário após a criação da task:",
-        userIdFromToken
-      );
+     const userId = userIdFromToken;
+     const user = await MongoClient.db.collection<User>('users').findOne({ id: userId });
+     if (user) {
+      user.tasks.push(createdTask);
+      // Salve o usuário atualizado no banco de dados
+      await MongoClient.db.collection('users').updateOne({ id: userId }, { $set: user });
+    } else {
+      // Trate o caso em que o usuário não é encontrado
+      throw new Error('Usuário não encontrado');
+    }
 
       return {
         statusCode: 201,

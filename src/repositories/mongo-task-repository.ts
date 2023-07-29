@@ -18,6 +18,7 @@ export class MongoTaskRepository implements ITaskRepository {
     if (!createdTask) {
       throw new Error("Failed to create task");
     }
+    console.log("Task saved in the database:", createdTask); 
 
     return createdTask;
   }
