@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 
 
 export interface User {
@@ -12,7 +13,8 @@ export interface User {
   username: string; 
 }
 
-interface Task {
+ export interface Task {
+  _id?: string ;
   taskId: string;  
   userId: string;  
   title: string;

@@ -1,5 +1,4 @@
 import express from "express";
-
 import { GetUsersController } from "./controllers/get-users/get-users";
 import { MongoGetUsersRepository } from "./repositories/get-users/mongo-get-users";
 import { MongoClient } from "./database/mongo";
@@ -16,6 +15,8 @@ import { CreateTaskController } from "./controllers/create-task/create-task";
 import { MongoTaskRepository } from "./repositories/mongo-task-repository";
 import dotenv from "dotenv";
 import { CreateTaskParams } from "./controllers/protocols";
+import { GetTasksController } from "./controllers/get-tasks/get-task";
+
 
 const main = async () => {
   dotenv.config();
@@ -157,8 +158,53 @@ const main = async () => {
     }
   });
 
+  
+app.get("/users/:id/tasks", async (req, res) => {
+  const userId = req.params.id;
+
+  // Verificar se o userId é válido ou se é necessário tratamento adicional aqui
+
+  const mongoTaskRepository = new MongoTaskRepository();
+  const getTasksController = new GetTasksController(mongoTaskRepository);
+
+  const { body, statusCode } = await getTasksController.handle({
+    params: { userId }, 
+  });
+  res.status(statusCode).json(body);
+});
+
+
+/*
+app.delete("/tasks/:id", async (req, res) => {
+  const taskId = req.params.id;
+
+  try {
+    const deletionResult = await mongoTaskRepository.deleteTaskById(taskId);
+
+    if (deletionResult) {
+      // Tarefa apagada com sucesso
+      res.status(200).json({ message: "Tarefa apagada com sucesso!" });
+    } else {
+      // Tarefa não encontrada ou ocorreu algum erro
+      res.status(404).json({ error: "Tarefa não encontrada ou ocorreu um erro ao apagar a tarefa." });
+    }
+  } catch (error: any) {
+    console.error("Erro ao apagar a tarefa:", error.message);
+    res.status(500).json({ error: "Erro ao apagar a tarefa. Verifique o servidor para mais detalhes." });
+  }
+});
+*/
+
+
+
+
+
+
+
+
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));
 };
 
 main();
+

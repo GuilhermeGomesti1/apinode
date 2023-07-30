@@ -1,6 +1,6 @@
 import { HttpRequest, HttpResponse, IController } from "../protocols";
 import { CreateTaskParams } from "../protocols";
-import { Task } from "../protocols";
+import { Task } from "../../models/user";
 import { ITaskRepository } from "../protocols";
 import { decodeToken } from "../../auth"; // Importa a função 'decodeToken'
 import { MongoClient } from "../../database/mongo";

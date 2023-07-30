@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-
+import { Task } from "../models/user";
 export interface HttpResponse<T> {
   statusCode: HttpStatusCode;
   body: T;
@@ -18,6 +18,7 @@ export enum HttpStatusCode {
   CREATED = 201,
   BAD_REQUEST = 400,
   UNAUTHORIZED = 401,
+  NOT_FOUND = 404,
   INTERNAL_SERVER_ERROR = 500,
 }
 export interface IController {
@@ -32,14 +33,16 @@ export interface CreateTaskParams {
   authorizationHeader?: string;
 }
 
-export interface ITaskRepository {
-  createTask(task: Task): Promise<Task>;
+export interface GetTasksHttpRequest extends HttpRequest<Record<string, never>> {
+  params: {
+    userId: string;
+  };
 }
 
-export interface Task {
-  taskId: string;
-  userId: string;
-  title: string;
-  description: string;
-  completed: boolean;
+export interface ITaskRepository {
+  getTasksByUserId(userIdFromToken: string): Promise<Task[]>;
+  createTask(task: Task): Promise<Task>;
+  //deleteTaskById(taskId: string): Promise<boolean>;
+
 }
+

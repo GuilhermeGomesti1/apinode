@@ -24,3 +24,8 @@ export const serverError = (): HttpResponse<string> => {
     body: "Something went wrong"
   };
 };
+
+export const notFound = (message: string): HttpResponse<string> => ({
+  statusCode: HttpStatusCode.NOT_FOUND,
+  body: message,
+});
