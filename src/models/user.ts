@@ -14,7 +14,7 @@ export interface User {
 }
 
  export interface Task {
-  _id?: string ;
+  _id?: string |ObjectId;
   taskId: string;  
   userId: string;  
   title: string;

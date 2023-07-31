@@ -174,7 +174,7 @@ app.get("/users/:id/tasks", async (req, res) => {
 });
 
 
-/*
+
 app.delete("/tasks/:id", async (req, res) => {
   const taskId = req.params.id;
 
@@ -193,7 +193,7 @@ app.delete("/tasks/:id", async (req, res) => {
     res.status(500).json({ error: "Erro ao apagar a tarefa. Verifique o servidor para mais detalhes." });
   }
 });
-*/
+
 
 
 
