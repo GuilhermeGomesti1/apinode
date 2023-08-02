@@ -197,7 +197,38 @@ app.delete("/tasks/:id", async (req, res) => {
 
 
 
+app.put("/tasks/:id", async (req, res) => {
+  const taskId = req.params.id;
+  
 
+  try {
+    const { title, description } = req.body;
+    console.log("Title:", title);
+console.log("Description:", description);
+    if (!title || !description) {
+      return res
+        .status(400)
+        .json({ error: "Title and description are required for task update." });
+    }
+
+    const updatedTask = await mongoTaskRepository.updateTask(taskId, {
+      title,
+      description,
+    });
+    console.log("Title:", title);
+console.log("Description:", description);
+    if (!updatedTask) {
+      return res.status(404).json({ error: "Task not found." });
+    }
+
+    return res.status(200).json(updatedTask);
+  } catch (error: any) {
+    console.error("Error updating task:", error.message);
+    return res.status(500).json({
+      error: "Error updating task. Please check the server for more details.",
+    });
+  }
+});
 
 
 

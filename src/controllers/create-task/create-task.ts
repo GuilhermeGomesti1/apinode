@@ -17,63 +17,66 @@ export class CreateTaskController implements IController {
     httpRequest: HttpRequest<CreateTaskParams>
   ): Promise<HttpResponse<Task | string>> {
     try {
-      const { title, description} = httpRequest.body || {};
+      const { title, description } = httpRequest.body || {};
       console.log("Credenciais recebidas:", { title, description });
-       if (!title || !description) {
+      if (!title || !description) {
         console.log("Dados inválidos");
         return unauthorized("Dados inválidos"); // Retorna resposta de não autorizado caso title ou description estejam faltando
       }
 
-      console.log('httpRequest get ',httpRequest);
-      
+      console.log("httpRequest get ", httpRequest);
+
       const authorizationHeader = httpRequest?.headers?.Authorization;
       if (!authorizationHeader) {
         // Se o cabeçalho de autorização não estiver presente, retorne uma resposta de não autorizado
         return {
           statusCode: 401,
-          body: 'Token de autorização não fornecido',
+          body: "Token de autorização não fornecido",
         };
       }
-      
-      console.log('httpRequest header',httpRequest?.headers)
+
+      console.log("httpRequest header", httpRequest?.headers);
       console.log("Authorization header:", authorizationHeader);
 
       const token = authorizationHeader?.split("Bearer ")[1]; // Extrai o token do cabeçalho de autorização
-      console.log("token:",token)
+      console.log("token:", token);
 
       if (!token) {
         console.log("Token não fornecido");
         return unauthorized("Token não fornecido");
       }
-  // Decodifica o token para obter o ID do usuário associado a ele
-  const decodedToken = decodeToken(token);
-  const userIdFromToken = decodedToken.userId;
-  console.log("ID do usuário a partir do token:", userIdFromToken);
+      // Decodifica o token para obter o ID do usuário associado a ele
+      const decodedToken = decodeToken(token);
+      const userIdFromToken = decodedToken.userId;
+      console.log("ID do usuário a partir do token:", userIdFromToken);
 
-  const task: Task = {
-    taskId: generateId(),
-    userId: userIdFromToken,
-    title,
-    description,
-    completed: false,
-  
-  };
-// Adiciona a tarefa ao usuário no banco de dados
-const createdTask = await this.taskRepository.createTask(task);
-console.log("Tarefa criada:", createdTask);
+      const task: Task = {
+        taskId: generateId(),
+        userId: userIdFromToken,
+        title,
+        description,
+        completed: false,
+      };
+      // Adiciona a tarefa ao usuário no banco de dados
+      const createdTask = await this.taskRepository.createTask(task);
+      console.log("Tarefa criada:", createdTask);
 
       // Decodifica o token JWT para obter o userId
-     // Atualiza a coleção de usuários no banco de dados
-     const userId = userIdFromToken;
-     const user = await MongoClient.db.collection<User>('users').findOne({ id: userId });
-     if (user) {
-      user.tasks.push(createdTask);
-      // Salve o usuário atualizado no banco de dados
-      await MongoClient.db.collection('users').updateOne({ id: userId }, { $set: user });
-    } else {
-      // Trate o caso em que o usuário não é encontrado
-      throw new Error('Usuário não encontrado');
-    }
+      // Atualiza a coleção de usuários no banco de dados
+      const userId = userIdFromToken;
+      const user = await MongoClient.db
+        .collection<User>("users")
+        .findOne({ id: userId });
+      if (user) {
+        user.tasks.push(createdTask);
+        // Salve o usuário atualizado no banco de dados
+        await MongoClient.db
+          .collection("users")
+          .updateOne({ id: userId }, { $set: user });
+      } else {
+        // Trate o caso em que o usuário não é encontrado
+        throw new Error("Usuário não encontrado");
+      }
 
       return {
         statusCode: 201,

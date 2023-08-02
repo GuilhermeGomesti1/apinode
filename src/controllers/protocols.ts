@@ -46,3 +46,8 @@ export interface ITaskRepository {
 
 }
 
+export interface EditTaskParams {
+  taskId: string;
+  title: string;
+  description: string;
+}

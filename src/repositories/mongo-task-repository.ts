@@ -100,5 +100,45 @@ export class MongoTaskRepository implements ITaskRepository {
       console.error("Erro em deleteTaskById:", error);
       throw new Error("Falha ao deletar tarefa");
     }
+  } 
+  async updateTask(taskId: string, updatedData: Partial<Task>): Promise<Task | null> {
+    try {
+      const objectIdTaskId = new ObjectId(taskId);
+  
+      // Verifique primeiro se a tarefa existe
+      const existingTask = await MongoClient.db
+        .collection<Task>("tasks")
+        .findOne({ _id: objectIdTaskId });
+  
+      if (!existingTask) {
+        // Se a tarefa não for encontrada, retorne null para indicar que a atualização não foi bem-sucedida
+        return null;
+      }
+  
+      // Atualize apenas as propriedades presentes em updatedData
+      const updatedTask = {
+        ...existingTask,
+        ...updatedData,
+      };
+  
+      // Atualize a tarefa no banco de dados
+      const result = await MongoClient.db
+        .collection<Task>("tasks")
+        .updateOne({ _id: objectIdTaskId }, { $set: updatedTask });
+  
+      if (result.modifiedCount !== 1) {
+        // Se o número de documentos modificados for diferente de 1, algo deu errado com a atualização
+        return null;
+      }
+      console.log("Updating task with ID:", taskId);
+      console.log("Updated data:", updatedData);
+      return updatedTask;
+    } catch (error) {
+      console.error("Error in updateTask:", error);
+      throw new Error("Failed to update task");
+    
+    }
+    
   }
 }
+
