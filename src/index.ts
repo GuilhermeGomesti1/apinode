@@ -24,7 +24,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "*", // Permitir qualquer origem
+      origin: "http://localhost:3000", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
@@ -111,6 +111,11 @@ const main = async () => {
     const { body, statusCode } = await signInController.handle({
       body: req.body,
     });
+    res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "*");
+  res.header("Access-Control-Allow-Headers", "*");
+
+  res.status(statusCode).send(body);
     res.status(statusCode).send(body);
   });
 
