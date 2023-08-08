@@ -24,15 +24,15 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "https://myapisystem-guilhermegomesti1.vercel.app", // Permitir qualquer origem
+      origin: "*", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
-      allowedHeaders: "Authorization",
+      allowedHeaders: "*",
     })
   );
 
-  app.options("https://myapisystem-guilhermegomesti1.vercel.app", (req, res) => {
+  app.options("*", (req, res) => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.status(200).send();
@@ -116,14 +116,7 @@ const main = async () => {
     res.status(statusCode).send(body);
   });
 
-  const corsOptions = {
-    origin: "https://myapisystem-guilhermegomesti1.vercel.app", // Substitua pela URL do seu frontend
-    methods: "POST", // Defina os métodos permitidos
-    exposedHeaders: ["Authorization"],
-    credentials: true,
-    allowedHeaders: "Authorization",
-  };
-  app.post("/signin/", cors(corsOptions), async (req, res) => {
+  app.post("/signin/", async (req, res) => {
     const mongoSignInRepository = new MongoSignInRepository();
     const signInController = new SignInController(mongoSignInRepository);
     const { body, statusCode } = await signInController.handle({
