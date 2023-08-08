@@ -24,7 +24,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "https://apinode1.onrender.com/", // Permitir qualquer origem
+      origin: "http://localhost:3000", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
