@@ -28,7 +28,7 @@ const main = async () => {
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
-      allowedHeaders: "*",
+      allowedHeaders: "Authorization",
     })
   );
 
@@ -121,6 +121,7 @@ const main = async () => {
     methods: "POST", // Defina os métodos permitidos
     exposedHeaders: ["Authorization"],
     credentials: true,
+    allowedHeaders: "Authorization",
   };
   app.post("/signin/", cors(corsOptions), async (req, res) => {
     const mongoSignInRepository = new MongoSignInRepository();
