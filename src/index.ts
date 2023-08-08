@@ -24,7 +24,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "*", // Permitir qualquer origem
+      origin: "https://myapisystem-guilhermegomesti1.vercel.app", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
@@ -32,7 +32,7 @@ const main = async () => {
     })
   );
 
-  app.options("*", (req, res) => {
+  app.options("https://myapisystem-guilhermegomesti1.vercel.app", (req, res) => {
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
     res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.status(200).send();
