@@ -116,7 +116,13 @@ const main = async () => {
     res.status(statusCode).send(body);
   });
 
-  app.post("/signin/", async (req, res) => {
+  const corsOptions = {
+    origin: "https://myapisystem-guilhermegomesti1.vercel.app", // Substitua pela URL do seu frontend
+    methods: "POST", // Defina os métodos permitidos
+    exposedHeaders: ["Authorization"],
+    credentials: true,
+  };
+  app.post("/signin/", cors(corsOptions), async (req, res) => {
     const mongoSignInRepository = new MongoSignInRepository();
     const signInController = new SignInController(mongoSignInRepository);
     const { body, statusCode } = await signInController.handle({
