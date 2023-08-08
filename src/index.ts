@@ -32,7 +32,18 @@ const main = async () => {
     })
   );
 
+  app.options("*", (req, res) => {
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.status(200).send();
+  });
 
+  app.use((req, res, next) => {
+    console.log("Requisição recebida:", req.method, req.url, req.headers);
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    next();
+  });
 
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
@@ -111,11 +122,6 @@ const main = async () => {
     const { body, statusCode } = await signInController.handle({
       body: req.body,
     });
-    res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Methods", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-
-  res.status(statusCode).send(body);
     res.status(statusCode).send(body);
   });
 
