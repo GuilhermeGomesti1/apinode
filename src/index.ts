@@ -24,7 +24,7 @@ const main = async () => {
 
   app.use(
     cors({
-      origin: "*", // Permitir qualquer origem
+      origin: "ttps://myapisystem-guilhermegomesti1.vercel.app", // Permitir qualquer origem
       methods: "*", // Permitir qualquer método
       exposedHeaders: ["Authorization"],
       credentials: true, // Permitir credenciais (por exemplo, cookies, autenticação HTTP)
