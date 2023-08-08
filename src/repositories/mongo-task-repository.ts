@@ -132,7 +132,9 @@ export class MongoTaskRepository implements ITaskRepository {
       }
       console.log("Updating task with ID:", taskId);
       console.log("Updated data:", updatedData);
+      
       return updatedTask;
+      
     } catch (error) {
       console.error("Error in updateTask:", error);
       throw new Error("Failed to update task");

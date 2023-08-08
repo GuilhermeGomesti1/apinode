@@ -17,7 +17,6 @@ import dotenv from "dotenv";
 import { CreateTaskParams } from "./controllers/protocols";
 import { GetTasksController } from "./controllers/get-tasks/get-task";
 
-
 const main = async () => {
   dotenv.config();
 
@@ -149,93 +148,92 @@ const main = async () => {
       res.status(statusCode).json(body);
     } catch (error) {
       console.error("Erro ao criar tarefa:", error);
+      res.status(500).json({
+        error: "Erro ao criar tarefa. Verifique o servidor para mais detalhes.",
+      });
+    }
+  });
+
+  app.get("/users/:id/tasks", async (req, res) => {
+    const userId = req.params.id;
+
+    // Verificar se o userId é válido ou se é necessário tratamento adicional aqui
+
+    const mongoTaskRepository = new MongoTaskRepository();
+    const getTasksController = new GetTasksController(mongoTaskRepository);
+
+    const { body, statusCode } = await getTasksController.handle({
+      params: { userId },
+    });
+    res.status(statusCode).json(body);
+  });
+
+  app.delete("/tasks/:id", async (req, res) => {
+    const taskId = req.params.id;
+
+    try {
+      const deletionResult = await mongoTaskRepository.deleteTaskById(taskId);
+
+      if (deletionResult) {
+        // Tarefa apagada com sucesso
+        res.status(200).json({ message: "Tarefa apagada com sucesso!" });
+      } else {
+        // Tarefa não encontrada ou ocorreu algum erro
+        res
+          .status(404)
+          .json({
+            error:
+              "Tarefa não encontrada ou ocorreu um erro ao apagar a tarefa.",
+          });
+      }
+    } catch (error: any) {
+      console.error("Erro ao apagar a tarefa:", error.message);
       res
         .status(500)
         .json({
           error:
-            "Erro ao criar tarefa. Verifique o servidor para mais detalhes.",
+            "Erro ao apagar a tarefa. Verifique o servidor para mais detalhes.",
         });
     }
   });
 
-  
-app.get("/users/:id/tasks", async (req, res) => {
-  const userId = req.params.id;
+  app.put("/tasks/:id", async (req, res) => {
+    const taskId = req.params.id;
 
-  // Verificar se o userId é válido ou se é necessário tratamento adicional aqui
+    try {
+      const { title, description } = req.body;
+      console.log("Title:", title);
+      console.log("Description:", description);
+      if (!title || !description) {
+        return res
+          .status(400)
+          .json({
+            error: "Title and description are required for task update.",
+          });
+      }
 
-  const mongoTaskRepository = new MongoTaskRepository();
-  const getTasksController = new GetTasksController(mongoTaskRepository);
+      const updatedTask = await mongoTaskRepository.updateTask(taskId, {
+        
+        title,
+        description,
+      });
+      console.log("Title:", title);
+      console.log("Description:", description);
+      if (!updatedTask) {
+        return res.status(404).json({ error: "Task not found." });
+      }
 
-  const { body, statusCode } = await getTasksController.handle({
-    params: { userId }, 
+      return res.status(200).json(updatedTask);
+    } catch (error: any) {
+      console.error("Error updating task:", error.message);
+      return res.status(500).json({
+        error: "Error updating task. Please check the server for more details.",
+      });
+    }
   });
-  res.status(statusCode).json(body);
-});
-
-
-
-app.delete("/tasks/:id", async (req, res) => {
-  const taskId = req.params.id;
-
-  try {
-    const deletionResult = await mongoTaskRepository.deleteTaskById(taskId);
-
-    if (deletionResult) {
-      // Tarefa apagada com sucesso
-      res.status(200).json({ message: "Tarefa apagada com sucesso!" });
-    } else {
-      // Tarefa não encontrada ou ocorreu algum erro
-      res.status(404).json({ error: "Tarefa não encontrada ou ocorreu um erro ao apagar a tarefa." });
-    }
-  } catch (error: any) {
-    console.error("Erro ao apagar a tarefa:", error.message);
-    res.status(500).json({ error: "Erro ao apagar a tarefa. Verifique o servidor para mais detalhes." });
-  }
-});
-
-
-
-
-app.put("/tasks/:id", async (req, res) => {
-  const taskId = req.params.id;
-  
-
-  try {
-    const { title, description } = req.body;
-    console.log("Title:", title);
-console.log("Description:", description);
-    if (!title || !description) {
-      return res
-        .status(400)
-        .json({ error: "Title and description are required for task update." });
-    }
-
-    const updatedTask = await mongoTaskRepository.updateTask(taskId, {
-      title,
-      description,
-    });
-    console.log("Title:", title);
-console.log("Description:", description);
-    if (!updatedTask) {
-      return res.status(404).json({ error: "Task not found." });
-    }
-
-    return res.status(200).json(updatedTask);
-  } catch (error: any) {
-    console.error("Error updating task:", error.message);
-    return res.status(500).json({
-      error: "Error updating task. Please check the server for more details.",
-    });
-  }
-});
-
-
-
 
   const port = process.env.PORT || 8000;
   app.listen(port, () => console.log(`listening on port ${port}!`));
 };
 
 main();
-
